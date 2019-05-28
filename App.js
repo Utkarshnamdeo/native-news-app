@@ -17,23 +17,34 @@ const instructions = Platform.select({
     'Double tap R on your keyboard to reload,\n' +
     'Shake or press menu button for dev menu'
 });
+import DeviceInfo from 'react-native-device-info';
 
 type Props = {};
 export default class App extends Component<Props> {
   constructor() {
     super();
     this.state = {
-      msg: 'Original'
+      msg: 'Original',
+      deviceName: '',
+      deviceId: ''
     };
   }
 
   componentDidMount() {
     this.checkAnalyticsStatus();
-  } 
+    this.getDeviceInfo();
+  }
 
-  async checkAnalyticsStatus()  {
+  getDeviceInfo() {
+    const deviceName = DeviceInfo.getDeviceName();
+    const deviceId = DeviceInfo.getUniqueID();
+    this.setState({ deviceName, deviceId });
+  }
+
+  async checkAnalyticsStatus() {
     const analyticsStatus = await Analytics.setEnabled(true);
     console.log('Appcenter Analytics Status: ', analyticsStatus);
+    console.log('device Id: ', this.state.deviceId);
   }
 
   change() {
@@ -50,16 +61,24 @@ export default class App extends Component<Props> {
     return (
       <View style={styles.container}>
         <Text style={styles.welcome}>Welcome to React Native!</Text>
-        <Text style={styles.instructions}>To get started, edit App.js</Text>
-        <Text style={styles.instructions}>{instructions}</Text>
+        <View style={styles.welcome}>
+          <Text>
+            This is group{' '}
+            {this.state.deviceId === '1512b1779fef3ba0' ? 'B' : 'A'}
+          </Text>
+        </View>
         <View style={styles.instructions}>
-          <Button
-            title='Click to toggle message'
-            onPress={this.change.bind(this)}
-          />
+          {this.state.deviceId === '1512b1779fef3ba0' ? (
+            <Button
+              title='Click to toggle message'
+              onPress={this.change.bind(this)}
+            />
+          ) :null}
         </View>
         <View style={styles.instructions}>
           <Text>{this.state.msg}</Text>
+          <Text>Device Name : {this.state.deviceName}</Text>
+          <Text>Device Id : {this.state.deviceId}</Text>
         </View>
       </View>
     );
